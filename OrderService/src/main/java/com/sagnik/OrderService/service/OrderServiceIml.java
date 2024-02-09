@@ -81,13 +81,13 @@ public class OrderServiceIml implements OrderService{
         log.info("GET ORDER DETAILS FOR ORDER ID :{} ",orderId);
         OrderEntity orderEntity=orderRepository.findById(orderId)
                 .orElseThrow(()->new CustomException("Order not found for OrderId"+orderId,"NOT_FOUND",404));
-
+        ProductRespponse productRespponse=restTemplate.getForObject("http://PRODUCT-SERVICE/product/"+orderEntity.getProductId(),ProductRespponse.class);
         log.info("Invoking product service to fetch the product for id:{}",orderEntity.getProductId());
         OrderResponse.ProductDetail productDetail=OrderResponse.ProductDetail.builder()
                 .productName(productRespponse.getProductName())
                 .productId(productRespponse.getProductId())
                 .build();
-        ProductRespponse productRespponse=restTemplate.getForObject("http://PRODUCT-SERVICE/product/"+orderEntity.getProductId(),ProductRespponse.class);
+        
         log.info("GETTING PAYMENT INFO IN THE PAYMENT SERVICE");
         PaymentResponse paymentResponse=restTemplate.getForObject("http://PAYMENT-SERVICE/payment/order/"+orderEntity.getProductId(),PaymentResponse.class);
         OrderResponse.PaymentDetails paymentDetails=OrderResponse.PaymentDetails.builder()
